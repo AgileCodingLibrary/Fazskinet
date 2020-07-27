@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -13,22 +15,24 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly StoreContext _context;
+        private readonly IProductRepository _repo;
 
-        public ProductsController(StoreContext context)
+        public ProductsController(StoreContext context, IProductRepository repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         [HttpGet]
-        public string GetProduct()
+        public async Task<IReadOnlyList<Product>> Get()
         {
-            return "All products";
+            return await _repo.GetProductsAsync();
         }
 
         [HttpGet("{Id}")]
-        public string GetProductById(int Id)
+        public async Task<Product> GetProductById(int Id)
         {
-            return $"Single product with Id = {Id}";
+            return await _repo.GetProductByIdAsync(Id);
         }
     }
 }
