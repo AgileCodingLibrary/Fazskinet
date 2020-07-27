@@ -16,7 +16,9 @@ namespace Infrastructure.Data
         {
             try
             {
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                var path = $"C:\\Users\\afzal\\source\\repos\\Fazskinet\\FazSkiNet\\Infrastructure";
 
                 if (!context.ProductBrands.Any())
                 {
