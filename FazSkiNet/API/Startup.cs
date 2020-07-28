@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using API.Helpers;
 using AutoMapper;
+using API.Errors;
 
 namespace API
 {
@@ -35,6 +36,23 @@ namespace API
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
             services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                        .Where(e => e.Value.Errors.Count > 0)
+                        .SelectMany(x => x.Value.Errors)
+                        .Select(x => x.ErrorMessage).ToArray();
+
+                    var errorResponse = new ApiValidationErrorResponse
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
             services.AddDbContext<StoreContext>(x => x.UseSqlServer(_config.GetConnectionString("DefaultConnection")));
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
